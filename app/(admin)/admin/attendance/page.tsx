@@ -7,9 +7,10 @@ import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, X, UserCheck, UserX } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/hooks/useAuth";
+import { startOfMonth, endOfMonth } from 'date-fns';
+import { Download } from 'lucide-react';
 
 interface AttendanceRecord {
   id: number;
@@ -39,6 +40,7 @@ export default function AdminAttendancePage() {
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isDownloading, setIsDownloading] = useState(true);
 
   useEffect(() => {
     fetchCenters();
@@ -77,6 +79,37 @@ export default function AdminAttendancePage() {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    try {
+      setIsDownloading(true);
+      const startDate = format(startOfMonth(selectedDate), 'yyyy-MM-dd');
+      const endDate = format(endOfMonth(selectedDate), 'yyyy-MM-dd');
+
+      const response = await axiosInstance.get('/attendance/report/download', {
+        params: {
+          startDate,
+          endDate,
+          programCenterId: selectedCenter,
+        },
+        responseType: 'blob',
+      });
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `attendance-report-${format(selectedDate, 'MMMM-yyyy')}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      setError('Failed to download report');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -129,13 +162,32 @@ export default function AdminAttendancePage() {
             View and manage attendance records
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={fetchAttendance}
-          disabled={!selectedCenter || isLoading}
-        >
-          Refresh
-        </Button>
+        <div className="flex space-x-3">
+          <Button
+              variant="outline"
+              onClick={fetchAttendance}
+              disabled={!selectedCenter || isLoading}
+          >
+            Refresh
+          </Button>
+          <Button
+              onClick={handleDownloadReport}
+              disabled={!selectedCenter || isDownloading}
+              className="bg-primary-600 hover:bg-primary-700"
+          >
+            {isDownloading ? (
+                <div className="flex items-center">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  Downloading...
+                </div>
+            ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Report
+                </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {error && (

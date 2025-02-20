@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -9,13 +9,10 @@ import {
   ClipboardCheck,
   LogOut,
   Menu,
-  X,
-  User,
   Bell,
   Search,
   ChevronDown,
   CircleDot,
-  RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { auth } from "@/lib/auth";
@@ -66,6 +63,12 @@ export default function AdminLayout({
       href: "/admin/library",
       icon: Library,
       description: "Resource management"
+    },
+    {
+      title: 'Volunteers',
+      href: '/admin/volunteers',
+      icon: Users,
+      description: "Volunteers Management"
     },
     {
       title: "Attendance",
@@ -194,10 +197,10 @@ export default function AdminLayout({
                   <div className="px-4 py-2 text-xs font-medium text-secondary-500">
                     ACCOUNT
                   </div>
-                  <a href="#profile" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
+                  <a href="#" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
                     Your Profile
                   </a>
-                  <a href="#settings" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
+                  <a href="#" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
                     Settings
                   </a>
                   <div className="my-1 h-px bg-secondary-200" />
