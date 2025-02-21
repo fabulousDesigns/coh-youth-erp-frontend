@@ -9,8 +9,8 @@ import { AlertCircle, X, UserCheck, UserX } from "lucide-react";
 import { format } from "date-fns";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/hooks/useAuth";
-import { startOfMonth, endOfMonth } from 'date-fns';
-import { Download } from 'lucide-react';
+import { startOfMonth, endOfMonth } from "date-fns";
+import { Download } from "lucide-react";
 
 interface AttendanceRecord {
   id: number;
@@ -40,7 +40,7 @@ export default function AdminAttendancePage() {
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isDownloading, setIsDownloading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     fetchCenters();
@@ -67,7 +67,8 @@ export default function AdminAttendancePage() {
       setIsLoading(true);
       const { data } = await axiosInstance.get("/attendance/report", {
         params: {
-          date: format(selectedDate, "yyyy-MM-dd"),
+          startDate: format(selectedDate, "yyyy-MM-dd"),
+          endDate: format(selectedDate, "yyyy-MM-dd"),
           programCenterId: selectedCenter,
         },
       });
@@ -85,29 +86,31 @@ export default function AdminAttendancePage() {
   const handleDownloadReport = async () => {
     try {
       setIsDownloading(true);
-      const startDate = format(startOfMonth(selectedDate), 'yyyy-MM-dd');
-      const endDate = format(endOfMonth(selectedDate), 'yyyy-MM-dd');
+      const startDate = format(startOfMonth(selectedDate), "yyyy-MM-dd");
+      const endDate = format(endOfMonth(selectedDate), "yyyy-MM-dd");
 
-      const response = await axiosInstance.get('/attendance/report/download', {
+      const response = await axiosInstance.get("/attendance/report/download", {
         params: {
           startDate,
           endDate,
           programCenterId: selectedCenter,
         },
-        responseType: 'blob',
+        responseType: "blob",
       });
 
-      // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `attendance-report-${format(selectedDate, 'MMMM-yyyy')}.xlsx`);
+      link.setAttribute(
+        "download",
+        `attendance-report-${format(selectedDate, "MMMM-yyyy")}.xlsx`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err: any) {
-      setError('Failed to download report');
+      setError("Failed to download report");
     } finally {
       setIsDownloading(false);
     }
@@ -164,27 +167,27 @@ export default function AdminAttendancePage() {
         </div>
         <div className="flex space-x-3">
           <Button
-              variant="outline"
-              onClick={fetchAttendance}
-              disabled={!selectedCenter || isLoading}
+            variant="outline"
+            onClick={fetchAttendance}
+            disabled={!selectedCenter || isLoading}
           >
             Refresh
           </Button>
           <Button
-              onClick={handleDownloadReport}
-              disabled={!selectedCenter || isDownloading}
-              className="bg-primary-600 hover:bg-primary-700"
+            onClick={handleDownloadReport}
+            disabled={!selectedCenter || isDownloading}
+            className="bg-primary-600 hover:bg-primary-700"
           >
             {isDownloading ? (
-                <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  Downloading...
-                </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                Downloading...
+              </div>
             ) : (
-                <>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Report
-                </>
+              <div className="flex items-center">
+                <Download className="w-4 h-4 mr-2" />
+                Download Report
+              </div>
             )}
           </Button>
         </div>

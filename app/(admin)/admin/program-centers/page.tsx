@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/pagination";
 
 interface ProgramCenter {
   id: number;
@@ -58,6 +59,8 @@ export default function ProgramCentersPage() {
     location: "",
     coordinatorId: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(7);
 
   useEffect(() => {
     fetchData();
@@ -132,6 +135,16 @@ export default function ProgramCentersPage() {
       center.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
       center.coordinator.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const paginatedCenters = filteredCenters.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(filteredCenters.length / itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, centers.length]);
 
   const columns = [
     {
@@ -294,7 +307,7 @@ export default function ProgramCentersPage() {
         </div>
 
         <DataTable
-          data={filteredCenters}
+          data={paginatedCenters}
           columns={columns}
           actions={(item: ProgramCenter) => (
             <div className="flex items-center gap-2">
@@ -361,6 +374,15 @@ export default function ProgramCentersPage() {
               </Button>
             </div>
           )}
+        />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+          totalItems={filteredCenters.length}
+          showItemsPerPage={true}
         />
       </div>
 

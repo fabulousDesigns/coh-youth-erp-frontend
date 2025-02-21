@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FileUpload } from "@/components/ui/file-upload";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/hooks/useAuth";
+import Pagination from "@/components/pagination";
 
 interface LibraryMaterial {
   id: number;
@@ -31,10 +32,25 @@ export default function AdminLibraryPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(7);
 
   useEffect(() => {
     fetchMaterials();
   }, []);
+
+  // Calculate paginated data
+  const paginatedMaterials = materials.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(materials.length / itemsPerPage);
+
+  // Reset to first page when data changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [materials.length]);
 
   const fetchMaterials = async () => {
     try {
@@ -285,73 +301,87 @@ export default function AdminLibraryPage() {
             </div>
           </div>
         ) : (
-          <DataTable
-            data={materials}
-            columns={columns}
-            actions={(item: LibraryMaterial) => (
-              <div className="flex items-center justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    handleDownload(item.id, item.originalName || item.name)
-                  }
-                  disabled={downloadingId === item.id}
-                >
-                  {downloadingId === item.id ? (
-                    <div className="flex items-center">
-                      <div className="w-4 h-4 border-2 px-3 py-2 border-primary-600 border-t-transparent rounded-full animate-spin mr-2" />
-                      Downloading...
-                    </div>
-                  ) : (
-                    <div
-                      className="
-                    flex 
-                    items-center 
-                    text-blue-600 
-                    hover:border-blue-300 
-                    hover:bg-blue-50 
-                    focus:outline-none 
-                    focus:ring-2 
-                    focus:ring-blue-500 
-                    focus:ring-offset-2
-                    transition-all 
-                    duration-200
-                    text-sm
-                    rounded-full
-                  "
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </div>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex 
+          <div>
+            {" "}
+            {/* Added wrapper div for pagination */}
+            <DataTable
+              data={paginatedMaterials}
+              columns={columns}
+              actions={(item: LibraryMaterial) => (
+                <div className="flex items-center justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      handleDownload(item.id, item.originalName || item.name)
+                    }
+                    disabled={downloadingId === item.id}
+                  >
+                    {downloadingId === item.id ? (
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 border-2 px-3 py-2 border-primary-600 border-t-transparent rounded-full animate-spin mr-2" />
+                        Downloading...
+                      </div>
+                    ) : (
+                      <div
+                        className="
+                flex 
                 items-center 
-                px-3 
-                py-2 
-                border 
-                border-red-200 
-                rounded-full
-                text-red-600 
-                hover:border-red-300 
-                hover:bg-red-50 
+                text-blue-600 
+                hover:border-blue-300 
+                hover:bg-blue-50 
                 focus:outline-none 
                 focus:ring-2 
-                focus:ring-red-500 
+                focus:ring-blue-500 
                 focus:ring-offset-2
                 transition-all 
                 duration-200
-                text-sm"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </Button>
-              </div>
-            )}
-          />
+                text-sm
+                rounded-full
+              "
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </div>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex 
+            items-center 
+            px-3 
+            py-2 
+            border 
+            border-red-200 
+            rounded-full
+            text-red-600 
+            hover:border-red-300 
+            hover:bg-red-50 
+            focus:outline-none 
+            focus:ring-2 
+            focus:ring-red-500 
+            focus:ring-offset-2
+            transition-all 
+            duration-200
+            text-sm"
+                    onClick={() => handleDelete(item.id)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              )}
+            />
+            {/* Add Pagination component */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={setItemsPerPage}
+              totalItems={materials.length}
+              showItemsPerPage={true}
+            />
+          </div>
         )}
       </div>
 

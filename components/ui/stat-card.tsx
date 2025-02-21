@@ -10,7 +10,7 @@ interface StatCardProps {
   trendType?: "positive" | "negative" | "neutral";
   className?: string;
   onClick?: () => void;
-  actions?: any;
+  actions?: React.ReactNode;
 }
 
 export function StatCard({
@@ -22,6 +22,7 @@ export function StatCard({
   trendType = "neutral",
   className,
   onClick,
+  actions,
 }: StatCardProps) {
   const trendColors = {
     positive: "text-green-600 bg-green-50",
@@ -41,23 +42,28 @@ export function StatCard({
       onClick={onClick}
     >
       <div className="flex flex-col space-y-4">
-        {/* Header with Icon */}
+        {/* Header with Icon and Actions */}
         <div className="flex items-center justify-between">
           <div className="p-3 bg-secondary-50 rounded-xl">
             <Icon className="w-6 h-6 text-primary-600" />
           </div>
-          {trend && (
-            <div
-              className={cn(
-                "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1",
-                trendColors[trendType]
-              )}
-            >
-              {trendType === "positive" && <TrendingUp className="w-4 h-4" />}
-              {trendType === "negative" && <TrendingDown className="w-4 h-4" />}
-              {trend}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {trend && (
+              <div
+                className={cn(
+                  "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1",
+                  trendColors[trendType]
+                )}
+              >
+                {trendType === "positive" && <TrendingUp className="w-4 h-4" />}
+                {trendType === "negative" && (
+                  <TrendingDown className="w-4 h-4" />
+                )}
+                {trend}
+              </div>
+            )}
+            {actions}
+          </div>
         </div>
 
         {/* Content */}

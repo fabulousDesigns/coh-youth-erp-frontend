@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { StatCard } from "@/components/ui/stat-card";
 import {
@@ -12,12 +12,23 @@ import {
   Calendar,
   BarChart,
   Loader2,
+  Eye,
 } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import { auth } from "@/lib/auth";
+import ProgramCenterModal from "@/components/ui/program-center-modal";
 
 interface VolunteerDashboardStats {
   assignedCenter: string;
+  programCenterId: number | null;
+  location: string;
+  coordinator: {
+    name: string;
+    email: string;
+    phone: string;
+  } | null;
+  totalVolunteers: number;
+  operatingHours: string;
   totalAttendance: number;
   libraryAccess: number;
   recentActivities: {
@@ -31,6 +42,13 @@ export default function VolunteerDashboard() {
   const [stats, setStats] = useState<VolunteerDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleViewProgramCenter = () => {
+    if (stats?.programCenterId) {
+      setIsModalOpen(true);
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -109,14 +127,24 @@ export default function VolunteerDashboard() {
 
       {/* Quick Stats Section */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Assigned Center"
-          value={stats?.assignedCenter || "N/A"}
-          icon={Building2}
-          description="Your current assignment"
-          trend="+2 months"
-          className="bg-gradient-to-br from-blue-50 to-white"
-        />
+        <div className="relative">
+          <StatCard
+            title="Assigned Center"
+            value={stats?.assignedCenter || "N/A"}
+            icon={Building2}
+            description="Your current assignment"
+            trend="+2 months"
+            className="bg-gradient-to-br from-blue-50 to-white"
+          />
+          {stats?.assignedCenter !== "N/A" && (
+            <button
+              onClick={handleViewProgramCenter}
+              className="absolute flex items-center gap-2 bottom-4 right-4 p-1 px-3 rounded-full bg-white bg-opacity-60 hover:bg-opacity-100 transition-all duration-200 text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 border border-primary-700"
+            >
+              <Eye className="w-4 h-4" /> <span className="text-sm">view</span>
+            </button>
+          )}
+        </div>
         <StatCard
           title="Days Present"
           value={stats?.totalAttendance || 0}
@@ -254,6 +282,21 @@ export default function VolunteerDashboard() {
                   />
                 </div>
               </div>
+              <ProgramCenterModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                programCenter={{
+                  name: stats?.assignedCenter || "N/A",
+                  location: stats?.location || "N/A",
+                  coordinator: stats?.coordinator || {
+                    name: "N/A",
+                    email: "N/A",
+                    phone: "N/A",
+                  },
+                  totalVolunteers: stats?.totalVolunteers || 0,
+                  operatingHours: stats?.operatingHours || "9:00 AM - 5:00 PM",
+                }}
+              />
             </div>
           </div>
         </div>

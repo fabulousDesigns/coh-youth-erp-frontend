@@ -8,16 +8,17 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/hooks/useAuth";
+import Pagination from "@/components/pagination";
 
 interface Volunteer {
   id: number;
   name: string;
   email: string;
-  phone?: string;
-  programCenter?: {
+  phone: string | null;
+  programCenter: {
     id: number;
     name: string;
-  };
+  } | null;
   createdAt: string;
 }
 
@@ -38,6 +39,18 @@ export default function VolunteersPage() {
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
     null
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const paginatedVolunteers = volunteers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(volunteers.length / itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [volunteers.length]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -77,7 +90,7 @@ export default function VolunteersPage() {
         programCenterId: formData.programCenterId
           ? parseInt(formData.programCenterId)
           : null,
-        phone: formData.phone || null,
+        phone: formData.phone.trim() || null,
       };
 
       if (modalMode === "create") {
@@ -215,7 +228,7 @@ export default function VolunteersPage() {
 
       <div className="bg-white rounded-lg shadow-sm">
         <DataTable
-          data={volunteers}
+          data={paginatedVolunteers}
           columns={columns}
           actions={(volunteer: Volunteer) => (
             <div className="flex items-center justify-end space-x-2">
@@ -234,23 +247,7 @@ export default function VolunteersPage() {
                   });
                   setIsModalOpen(true);
                 }}
-                className="flex items-center
-                                            px-3
-                                            py-2
-                                            border
-                                            border-blue-200
-                                            rounded-md
-                                            text-blue-600
-                                            hover:border-blue-300
-                                            hover:bg-blue-50
-                                            focus:outline-none
-                                            focus:ring-2
-                                            focus:ring-blue-500
-                                            focus:ring-offset-2
-                                            transition-all
-                                            duration-200
-                                            text-sm
-                                          "
+                className="flex items-center px-3 py-2 border border-blue-200 rounded-md text-blue-600 hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 text-sm"
               >
                 <Pencil className="w-4 h-4 mr-2" />
                 Edit
@@ -258,31 +255,23 @@ export default function VolunteersPage() {
               <Button
                 variant="outline"
                 onClick={() => handleDelete(volunteer.id)}
-                className="
-                                            flex
-                                            items-center
-                                            px-3
-                                            py-2
-                                            border
-                                            border-red-200
-                                            rounded-md
-                                            text-red-600
-                                            hover:border-red-300
-                                            hover:bg-red-50
-                                            focus:outline-none
-                                            focus:ring-2
-                                            focus:ring-red-500
-                                            focus:ring-offset-2
-                                            transition-all
-                                            duration-200
-                                            text-sm
-                                          "
+                className="flex items-center px-3 py-2 border border-red-200 rounded-md text-red-600 hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 text-sm"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete
               </Button>
             </div>
           )}
+        />
+        {/* Add Pagination component */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+          totalItems={volunteers.length}
+          showItemsPerPage={true}
         />
       </div>
 

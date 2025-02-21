@@ -14,7 +14,11 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react";
-// Date utilities would be imported in a real app
+import { AttendanceStatus, AttendanceRecord } from "@/types/attendance";
+import axiosInstance from "@/lib/axios";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
+
 const format = (date: Date, format: string) => date.toLocaleDateString();
 const isToday = (date: Date) => {
   const today = new Date();
@@ -25,10 +29,6 @@ const startOfMonth = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth(), 1);
 const endOfMonth = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth() + 1, 0);
-import { AttendanceStatus, AttendanceRecord } from "@/types/attendance";
-import axiosInstance from "@/lib/axios";
-import { useAuth } from "@/hooks/useAuth";
-import { cn } from "@/lib/utils";
 
 export default function VolunteerAttendancePage() {
   useAuth("volunteer");

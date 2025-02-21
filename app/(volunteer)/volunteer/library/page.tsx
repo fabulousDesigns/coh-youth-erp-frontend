@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axios";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/pagination";
 
 interface LibraryMaterial {
   id: number;
@@ -37,6 +38,8 @@ export default function VolunteerLibraryPage() {
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(7);
 
   useEffect(() => {
     fetchMaterials();
@@ -105,6 +108,17 @@ export default function VolunteerLibraryPage() {
       selectedType === "all" || material.type.toLowerCase() === selectedType;
     return matchesSearch && matchesType;
   });
+
+  const paginatedMaterials = filteredMaterials.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredMaterials.length / itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedType]);
 
   const columns = [
     {
@@ -280,32 +294,44 @@ export default function VolunteerLibraryPage() {
             </p>
           </div>
         ) : (
-          <DataTable
-            data={filteredMaterials}
-            columns={columns}
-            actions={(item: LibraryMaterial) => (
-              <Button
-                variant="outline"
-                onClick={() =>
-                  handleDownload(item.id, item.originalName || item.name)
-                }
-                disabled={downloadingId === item.id}
-                className="text-primary-600 hover:text-primary-700 border-primary-200 hover:border-primary-300 hover:bg-primary-50"
-              >
-                {downloadingId === item.id ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
-                    <span>Downloading...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <Download className="w-4 h-4" />
-                    <span>Download</span>
-                  </div>
-                )}
-              </Button>
-            )}
-          />
+          <div>
+            <DataTable
+              data={paginatedMaterials}
+              columns={columns}
+              actions={(item: LibraryMaterial) => (
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    handleDownload(item.id, item.originalName || item.name)
+                  }
+                  disabled={downloadingId === item.id}
+                  className="text-primary-600 hover:text-primary-700 border-primary-200 hover:border-primary-300 hover:bg-primary-50"
+                >
+                  {downloadingId === item.id ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
+                      <span>Downloading...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Download className="w-4 h-4" />
+                      <span>Download</span>
+                    </div>
+                  )}
+                </Button>
+              )}
+            />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={setItemsPerPage}
+              totalItems={filteredMaterials.length}
+              showItemsPerPage={true}
+              className="border-t border-secondary-200"
+            />
+          </div>
         )}
       </div>
     </div>
