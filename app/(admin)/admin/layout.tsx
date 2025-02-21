@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -50,32 +50,32 @@ export default function AdminLayout({
       title: "Dashboard",
       href: "/admin/dashboard",
       icon: LayoutDashboard,
-      description: "Overview and analytics"
+      description: "Overview and analytics",
     },
     {
       title: "Program Centers",
       href: "/admin/program-centers",
       icon: Users,
-      description: "Manage center locations"
+      description: "Manage center locations",
     },
     {
       title: "Library",
       href: "/admin/library",
       icon: Library,
-      description: "Resource management"
+      description: "Resource management",
     },
     {
-      title: 'Volunteers',
-      href: '/admin/volunteers',
+      title: "Volunteers",
+      href: "/admin/volunteers",
       icon: Users,
-      description: "Volunteers Management"
+      description: "Volunteers Management",
     },
     {
       title: "Attendance",
       href: "/admin/attendance",
       icon: ClipboardCheck,
-      description: "Track volunteer attendance"
-    }
+      description: "Track volunteer attendance",
+    },
   ];
 
   return (
@@ -93,7 +93,9 @@ export default function AdminLayout({
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
               <CircleDot className="h-5 w-5 text-white" />
             </div>
-            <span className="font-sans text-lg font-semibold text-primary-900">Admin Portal</span>
+            <span className="font-sans text-lg font-semibold text-primary-900">
+              Admin Portal
+            </span>
           </div>
 
           {/* Search */}
@@ -132,7 +134,9 @@ export default function AdminLayout({
                 />
                 <div>
                   <div className="font-medium leading-none">{item.title}</div>
-                  <div className="mt-1 text-xs text-secondary-500">{item.description}</div>
+                  <div className="mt-1 text-xs text-secondary-500">
+                    {item.description}
+                  </div>
                 </div>
               </Link>
             ))}
@@ -183,11 +187,11 @@ export default function AdminLayout({
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100">
                   <span className="text-sm font-medium text-primary-600">
-                    {auth.getUser()?.name?.charAt(0) || 'A'}
+                    {auth.getUser()?.name?.charAt(0) || "A"}
                   </span>
                 </div>
                 <span className="text-sm font-medium">
-                  {auth.getUser()?.name || 'Admin'}
+                  {auth.getUser()?.name || "Admin"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-secondary-400" />
               </button>
@@ -197,12 +201,12 @@ export default function AdminLayout({
                   <div className="px-4 py-2 text-xs font-medium text-secondary-500">
                     ACCOUNT
                   </div>
-                  <a href="#" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
+                  {/* <a href="#" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
                     Your Profile
                   </a>
                   <a href="#" className="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
                     Settings
-                  </a>
+                  </a> */}
                   <div className="my-1 h-px bg-secondary-200" />
                   <button
                     onClick={handleLogout}
@@ -218,9 +222,7 @@ export default function AdminLayout({
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-7xl p-6">
-            {children}
-          </div>
+          <div className="mx-auto max-w-7xl p-6">{children}</div>
         </main>
       </div>
     </div>

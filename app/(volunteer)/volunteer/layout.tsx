@@ -257,7 +257,7 @@ export default function VolunteerLayout({
                     </div>
                     <div className="hidden md:flex items-center">
                       <span className="text-sm font-medium text-secondary-700">
-                        John Doe
+                        {auth.getUser()?.name || "Volunteer"}
                       </span>
                       <ChevronDown className="w-4 h-4 ml-1 text-secondary-400" />
                     </div>
@@ -269,7 +269,7 @@ export default function VolunteerLayout({
                       className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 
                                   border border-secondary-200 z-50"
                     >
-                      <a
+                      {/* <a
                         href="#profile"
                         className="block px-4 py-2 text-sm text-secondary-700 
                                                   hover:bg-secondary-50"
@@ -282,7 +282,7 @@ export default function VolunteerLayout({
                                                    hover:bg-secondary-50"
                       >
                         Settings
-                      </a>
+                      </a> */}
                       <div className="border-t border-secondary-200" />
                       <button
                         onClick={handleLogout}
